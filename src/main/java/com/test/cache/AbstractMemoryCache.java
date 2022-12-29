@@ -30,10 +30,11 @@ public abstract class AbstractMemoryCache<K, V> implements Cache<K, V> {
 
     @Override
     public void put(K key, V value) {
+        Optional<K> cacheKey = defineCacheKey(key);
         CacheValue<V> cacheValue = createCacheValue(value);
+
         try {
-            Optional<K> optKey = defineKey(key);
-            cache.put(optKey, cacheValue);
+            cache.put(cacheKey, cacheValue);
             log.debug("Successfully put value to cache, key {}", key);
         } catch (RuntimeException e) {
             log.error("Failed to put value in cache, key {}", key, e);
@@ -48,9 +49,9 @@ public abstract class AbstractMemoryCache<K, V> implements Cache<K, V> {
      */
     @Override
     public V get(K key) {
-        Optional<K> optKey = defineKey(key);
+        Optional<K> cacheKey = defineCacheKey(key);
+        CacheValue<V> cachedValue = cache.get(cacheKey);
 
-        CacheValue<V> cachedValue = cache.get(optKey);
         if (cachedValue == null) {
             log.debug("Value in not cached, key {}", key);
             return getValueFromDatasourceAndPutInCache(key);
@@ -69,8 +70,10 @@ public abstract class AbstractMemoryCache<K, V> implements Cache<K, V> {
 
     @Override
     public void evict(K key) {
+        Optional<K> cacheKey = defineCacheKey(key);
+
         try {
-            cache.remove(Optional.of(key));
+            cache.remove(cacheKey);
             log.debug("Evict value, key {}", key);
         } catch (NullPointerException ex) {
             log.error("can not remove null value key");
@@ -113,7 +116,7 @@ public abstract class AbstractMemoryCache<K, V> implements Cache<K, V> {
      * @return Optional.of(key) if value not null and Optional.empty() if null
      * ConcurrentMap does not allow to store null and Optional.of(null) as key/value
      */
-    private Optional<K> defineKey(K key) {
+    private Optional<K> defineCacheKey(K key) {
         return key != null ? Optional.of(key) : Optional.empty();
     }
 
