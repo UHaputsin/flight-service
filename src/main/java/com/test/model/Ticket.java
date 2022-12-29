@@ -12,7 +12,7 @@ import lombok.Data;
 public class Ticket {
 
     /**
-     * An integer value to keep database ID
+     * Integer value to keep database ID
      */
     private Integer id;
 }
