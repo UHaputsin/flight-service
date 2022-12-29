@@ -25,6 +25,6 @@ public class TicketController {
      */
     @GetMapping("/{id}")
     public TicketAvailabilityResponseDto findTicketById(@PathVariable String id) {
-        return ticketService.existById(id);
+        return ticketService.existByIdCached(id);
     }
 }
