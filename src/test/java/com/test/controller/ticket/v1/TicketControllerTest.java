@@ -34,8 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 class TicketControllerTest {
 
-    private static final int TICKET_ID = 200;
-
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -52,7 +50,7 @@ class TicketControllerTest {
     //Verify that ticketController bean exists
     @Order(1)
     @Test
-    public void givenWac_whenServletContext_thenItProvidesTicketController() {
+    public void testIfProvidesTicketController() {
         ServletContext servletContext = webApplicationContext.getServletContext();
 
         assertNotNull(servletContext);
@@ -62,11 +60,12 @@ class TicketControllerTest {
 
     @Test
     public void given_CheckTicketAvailabilityAPI_when_TicketExists_Expect_AvailableTrue() throws Exception {
-        Ticket ticket = new Ticket(TICKET_ID);
+        int ticketId = 200;
+        Ticket ticket = new Ticket(ticketId);
 
         when(ticketRepository.findById(any())).thenReturn(Optional.of(ticket));
 
-        mockMvc.perform(get(String.format("%s/%s", TICKET_CONTROLLER_MAPPING_V1, TICKET_ID)))
+        mockMvc.perform(get(String.format("%s/%s", TICKET_CONTROLLER_MAPPING_V1, ticketId)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("available").value(true));
@@ -74,9 +73,10 @@ class TicketControllerTest {
 
     @Test
     public void given_CheckTicketAvailabilityAPI_when_TicketNotExists_Expect_AvailableFalse() throws Exception {
+        int ticketId = 300;
         when(ticketRepository.findById(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(get(String.format("%s/%s", TICKET_CONTROLLER_MAPPING_V1, TICKET_ID)))
+        mockMvc.perform(get(String.format("%s/%s", TICKET_CONTROLLER_MAPPING_V1, ticketId)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("available").value(false));

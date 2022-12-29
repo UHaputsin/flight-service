@@ -43,7 +43,7 @@ class CheckInControllerTest {
     //Verify that checkInController bean exists
     @Order(1)
     @Test
-    public void givenWac_whenServletContext_thenItProvidesCheckInController() {
+    public void testIfProvidesCheckInController() {
         ServletContext servletContext = webApplicationContext.getServletContext();
 
         assertNotNull(servletContext);
